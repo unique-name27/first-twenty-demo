@@ -43,6 +43,7 @@
   --hover: rgb(0 0 0 / 0.045);
   --press: rgb(0 0 0 / 0.1);
   --selection: rgb(0 53 204 / 0.2);
+  --focus-fill: rgb(0 53 204 / 0.06);
   --link-line: rgb(0 0 0 / 0.55);
   --w-regular: 400;
   --w-medium: 500;
@@ -76,6 +77,7 @@
     --hover: rgb(255 255 255 / 0.06);
     --press: rgb(255 255 255 / 0.13);
     --selection: rgb(134 179 255 / 0.3);
+    --focus-fill: rgb(134 179 255 / 0.1);
     --link-line: rgb(243 242 238 / 0.55);
     --w-regular: 370;
     --w-medium: 460;
@@ -302,13 +304,21 @@ main:focus,
 /* ---------- Page head: the thick-and-thin rule -------------------------------------------------- */
 
 .pagehead {
+  position: relative;
   margin-top: 2rem;
   padding-top: 1.25rem;
   padding-bottom: 2.25rem;
   border-top: 3px solid var(--rule);
-  box-shadow:
-    inset 0 2px 0 var(--paper),
-    inset 0 3px 0 var(--rule);
+}
+
+/* The thin rule: 1px, 2px under the thick one. A border rather than a shadow, so forced colors keep it. */
+.pagehead::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 0;
+  left: 0;
+  border-top: 1px solid var(--rule);
 }
 
 .kicker {
@@ -442,13 +452,6 @@ main:focus,
   text-transform: uppercase;
 }
 
-.count {
-  margin: 0;
-  font-size: 0.875rem;
-  font-weight: var(--w-semi);
-  color: var(--ink-2);
-}
-
 /* ---------- Open roles ------------------------------------------------------------------------- */
 
 .team {
@@ -464,20 +467,20 @@ main:focus,
   }
 }
 
+.team__head {
+  padding: 1.125rem 0 0.25rem;
+}
+
 .team__name {
   margin: 0;
-  padding: 1.125rem 0 0.25rem;
   font-size: 1.125rem;
   line-height: 1.3;
 }
 
 .team__count {
-  display: block;
-  margin-top: 0.125rem;
+  margin: 0.125rem 0 0;
   font-size: 0.875rem;
-  font-weight: var(--w-regular);
   color: var(--ink-2);
-  letter-spacing: 0;
 }
 
 .roles {
@@ -486,14 +489,15 @@ main:focus,
   list-style: none;
 }
 
-/* A role row is one big target: the title link stretches over the whole row. */
+/* A role row is one big target: the title link stretches over the whole row. The row keeps to the
+   column, so its rules, hover fill and focus ring line up with every other rule on the page. */
 .role {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.5rem 2rem;
-  margin-inline: -0.75rem;
-  padding: 1rem 0.75rem;
+  margin-inline: 0;
+  padding: 1rem 0;
   border-top: 1px solid var(--line);
   transition: background-color 90ms linear;
 }
@@ -551,9 +555,12 @@ main:focus,
 }
 
 @supports selector(:has(a)) {
+  /* The ring sits on the row's own edge and a light accent tint fills it, so the focused row reads as
+     a selected cell while its text stays on the column line. */
   .role:has(.role__link:focus-visible) {
     outline: 2px solid var(--focus);
-    outline-offset: -2px;
+    outline-offset: 0;
+    background: var(--focus-fill);
   }
 
   .role__link:focus-visible {
@@ -690,10 +697,15 @@ main:focus,
   border-color: var(--line-strong);
 }
 
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
 /* ---------- Job page --------------------------------------------------------------------------- */
 
 .crumbs {
-  margin-top: 1rem;
+  margin: 1rem 0 0;
 }
 
 .back {
@@ -808,6 +820,18 @@ main:focus,
   margin: 0;
   font-weight: var(--w-semi);
   line-height: 1.4;
+}
+
+/* The way to apply stays in view with the sticky column. On narrower screens the facts sit right under
+   the page head's own Apply button, so this one would only repeat it. */
+.facts__apply {
+  margin: 1.25rem 0 0;
+}
+
+@media (max-width: 59.99em) {
+  .facts__apply {
+    display: none;
+  }
 }
 
 .facts__list > .facts__pay {
@@ -970,6 +994,36 @@ main:focus,
   line-height: 1.08;
   letter-spacing: -0.025em;
   text-transform: none;
+}
+
+.apply__meta {
+  margin: 0.875rem 0 0;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.apply__pay {
+  margin: 1.25rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+/* On a phone the form follows the title straight away; the pay is already in the facts above. */
+@media (max-width: 59.99em) {
+  .apply__pay {
+    display: none;
+  }
+}
+
+@media (min-width: 60em) and (min-height: 40em) {
+  .apply__intro {
+    align-self: stretch;
+  }
+
+  .apply__sticky {
+    position: sticky;
+    top: 1.5rem;
+  }
 }
 
 .apply__body {
@@ -1256,6 +1310,42 @@ main:focus,
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+
+/* ---------- Forced colors ---------------------------------------------------------------------- */
+
+/* Windows High Contrast drops backgrounds and box shadows. The square markers are backgrounds, so they
+   opt out and paint in the system text color; an invalid field gets a 3px frame instead of a shadow. */
+@media (forced-colors: active) {
+  .brand__mark,
+  .fiction__tag::before,
+  .status__mark,
+  .ticks li::before,
+  .field__error::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .facts::before {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
+
+  .input[aria-invalid="true"],
+  .input[aria-invalid="true"]:hover {
+    border: 3px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .file[aria-invalid="true"]::file-selector-button {
+    border: 3px solid ButtonText;
+    box-shadow: none;
+  }
+
+  .skip,
+  .btn--primary {
+    border: 1px solid;
+  }
 }
 
 /* ---------- Motion ----------------------------------------------------------------------------- */
