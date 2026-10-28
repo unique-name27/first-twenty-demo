@@ -97,7 +97,7 @@ the UI must say so where it matters and never pretend otherwise. Access helpers 
 
 ## Design rules
 
-- **Looks.** The app ships several complete visual styles (Sleek, 1990s web, Comic book, Trading desk),
+- **Looks.** The app ships several complete visual styles (Sleek, 1990s web, Comic book, Trading desk, City pop),
   picked in the Display menu. `docs/LOOKS.md` is the contract: read it before any UI work. Every screen must
   work in every look, so new UI is built only from the tokens and the kit, never from one look's colors,
   fonts, radii or shadows. Never put look-specific values in `src/styles.css` or a component.
@@ -189,7 +189,7 @@ Pure logic in `src/domain/**` gets unit tests next to it (`*.test.ts`). Use fixe
 
 | Route | Page | Owner |
 |---|---|---|
-| `#home` | Home (Tonight header, inbox, threshold card, growth chart, this week, hiring pulse, checklists in flight, people cost; First hire kit at headcount 1). Employees land on Me instead. | features/home (+ `src/domain/inbox.ts`) |
+| `#home` | Home. Admin: date and one-line answer, KPI strip (legal exposure, people cost, headcount, runway), Legal exposure and Approvals columns, then cost and runway, headcount vs plan, hiring and joining and leaving tables, with the full inbox and This week folded (`FinanceHome.tsx`, derived data in `dashboard.ts`). Hiring manager: Tonight header, inbox, their week, their jobs' pulse. First hire kit at headcount 1. Employees land on Me instead. | features/home (+ `src/domain/inbox.ts`) |
 | `#hiring[.jobs\|.candidates\|.offers\|.kits]` | Hiring tabs. `#hiring.add[.<jobId>]` opens quick add; `#hiring.new-job[.<planSlotId>]` opens the new job sheet. Synced with a server that serves careers pages, the header links to the company's page (`useServerAccount` from `@/sync`). | features/hiring |
 | `#job.<id>[.board\|.list\|.sweep\|.edit\|.posting]` | Job pipeline (list default under 768px), Sweep mode, edit, posting text (`.edit.posting` edits, then returns to the posting) | features/hiring |
 | `#candidate.<id>[.offer.<applicationId>]` | Candidate profile; `.offer.<applicationId>` (`links.candidateOffer`) puts focus on that application's offer next action | features/hiring |
